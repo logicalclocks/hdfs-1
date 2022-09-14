@@ -1,6 +1,7 @@
 package hdfs
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"time"
@@ -92,13 +93,13 @@ func (fi *FileInfo) Sys() interface{} {
 // Owner returns the name of the user that owns the file or directory. It's not
 // part of the os.FileInfo interface.
 func (fi *FileInfo) Owner() string {
-	return fi.status.GetOwner()
+	return djb2([]byte(fi.status.GetOwner()))
 }
 
 // OwnerGroup returns the name of the group that owns the file or directory.
 // It's not part of the os.FileInfo interface.
 func (fi *FileInfo) OwnerGroup() string {
-	return fi.status.GetGroup()
+	return djb2([]byte(fi.status.GetGroup()))
 }
 
 // AccessTime returns the last time the file was accessed. It's not part of the
@@ -121,4 +122,14 @@ func (fi *FileInfo) FileId() uint64 {
 
 func (fi *FileInfo) Length() uint64 {
 	return *fi.status.Length
+}
+
+func djb2(bytes []byte) string {
+	hash := uint64(5381)
+
+	for _, b := range bytes {
+		hash += uint64(b) + hash + hash<<5
+	}
+
+	return "hopsfs_usr" + fmt.Sprintf("%v", hash)
 }

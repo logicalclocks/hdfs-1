@@ -3,3 +3,4 @@ gohdfs*
 hdfs
 !hdfs/
 minicluster.log
+.idea/
