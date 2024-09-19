@@ -212,6 +212,8 @@ func (bw *BlockWriter) writeBlockWriteRequest(w io.Writer) error {
 			},
 			ClientName: proto.String(bw.ClientName),
 		},
+		StorageType:           bw.Block.StorageTypes[0].Enum(),
+		TargetStorageTypes:    bw.convertStorgeTypeToProto(1),
 		Targets:               targets,
 		Stage:                 bw.currentStage().Enum(),
 		PipelineSize:          proto.Uint32(uint32(len(targets))),
@@ -225,4 +227,12 @@ func (bw *BlockWriter) writeBlockWriteRequest(w io.Writer) error {
 	}
 
 	return writeBlockOpRequest(w, writeBlockOp, op)
+}
+
+func (bw *BlockWriter) convertStorgeTypeToProto(startIdx int) []hdfs.StorageTypeProto {
+	targetStorageTypes := []hdfs.StorageTypeProto{}
+	for i := startIdx; i < len(bw.Block.StorageTypes); i++ {
+		targetStorageTypes = append(targetStorageTypes, *bw.Block.StorageTypes[i].Enum())
+	}
+	return targetStorageTypes
 }
